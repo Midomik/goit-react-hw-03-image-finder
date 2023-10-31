@@ -19,47 +19,36 @@ export class App extends Component {
     modalData: null,
     error: null,
   };
-  fetchPosts = async query => {
-    try {
-      this.setState({ isLoading: true });
-      const API_KEY = '39444105-d76e704d7b0040e55e99f4aff';
-      const { data } = await axios.get(
-        `https://pixabay.com/api/?q=${query}&page=${this.state.page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
-      );
-      this.setState({
-        posts: data.hits,
-        searchQuery: query,
-        totalHits: data.totalHits,
-      });
-      console.log(data);
-    } catch (error) {
-      this.setState({ error: error.message });
-    } finally {
-      this.setState({ isLoading: false });
+  fetchPosts = query => {
+    if (this.state.searchQuery !== query) {
+      this.setState({ searchQuery: query, page: 1, posts: [] });
     }
   };
-  componentDidMount() {
-    // this.fetchPosts();
-    // this.loadMore();
-  }
-  loadMore = async () => {
-    try {
-      this.setState({ isLoading: true });
-      const API_KEY = '39444105-d76e704d7b0040e55e99f4aff';
-      const { data } = await axios.get(
-        `https://pixabay.com/api/?q=${this.state.searchQuery}&page=${
-          this.state.page + 1
-        }&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
-      );
-      this.setState({
-        posts: [...this.state.posts, ...data.hits],
-        page: this.state.page + 1,
-      });
-    } catch (error) {
-      this.setState({ error: error.message });
-    } finally {
-      this.setState({ isLoading: false });
+  async componentDidUpdate(_, prevState) {
+    if (
+      prevState.searchQuery !== this.state.searchQuery ||
+      prevState.page !== this.state.page
+    ) {
+      try {
+        this.setState({ isLoading: true });
+        const API_KEY = '39444105-d76e704d7b0040e55e99f4aff';
+        const { data } = await axios.get(
+          `https://pixabay.com/api/?q=${this.state.searchQuery}&page=${this.state.page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
+        );
+        this.setState({
+          posts: [...this.state.posts, ...data.hits],
+          totalHits: data.totalHits,
+        });
+      } catch (error) {
+        this.setState({ error: error.message });
+      } finally {
+        this.setState({ isLoading: false });
+      }
     }
+  }
+
+  loadMore = async () => {
+    this.setState(prevState => ({ page: prevState.page + 1 }));
   };
   openModal = dataModal => {
     this.setState({ isOpenModal: true, modalData: dataModal });

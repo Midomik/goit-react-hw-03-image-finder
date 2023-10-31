@@ -1,7 +1,6 @@
 import css from './ImageGallery.module.css';
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 export const ImageGallery = ({ data, openModal }) => {
-  console.log(data);
   return (
     <ul className={css.image_gallery}>
       {data !== null &&
